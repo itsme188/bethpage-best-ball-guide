@@ -34,25 +34,72 @@ h1 { font-size: clamp(42px, 8vw, 78px); line-height: .98; letter-spacing: -.04em
 h1 span { color: var(--yellow); }
 .hero-copy { max-width: 690px; font-size: 18px; line-height: 1.6; color: #dbe6de; margin: 24px 0 32px; }
 .start-card { display: flex; justify-content: space-between; align-items: center; gap: 22px; max-width: 760px; padding: 20px 22px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 8px; }
-.start-card div { display: grid; gap: 5px; }
+.start-card > div:first-child { display: grid; gap: 5px; }
 .start-card strong { font-size: 22px; }
 .start-label { color: #b8ccbf; text-transform: uppercase; letter-spacing: .12em; font-size: 11px; font-weight: 800; }
 .start-card a { flex: none; text-decoration: none; font-weight: 800; background: var(--yellow); color: var(--ink); padding: 13px 16px; border-radius: 4px; }
 .start-card a span { margin-left: 10px; }
+.start-actions { display: flex; align-items: center; gap: 9px; }
+.start-card .customize-link { color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.32); font-size: 11px; }
 .weather-strip { display: flex; align-items: center; gap: 12px; max-width: 760px; margin-top: 14px; color: #dbe6de; font-size: 14px; }
 .weather-strip div { display: grid; gap: 2px; }
 .weather-strip strong { color: #fff; }
 .weather-strip small { font-size: 12px; }
 .weather-icon { font-size: 23px; color: var(--yellow); }
 
-.playbook, .quick-reference, .source-note { max-width: 1160px; margin: 0 auto; padding: 70px 24px; }
+.playbook, .quick-reference, .source-note, .event-essentials, .setup-section, .hospitality-section, .mission-section { max-width: 1160px; margin: 0 auto; padding: 70px 24px; }
 .playbook { display: grid; grid-template-columns: 1fr 1.25fr; gap: 70px; }
 .section-kicker { color: var(--red); margin: 0 0 12px; }
-.playbook h2, .quick-reference h2 { font-size: clamp(30px, 4vw, 48px); letter-spacing: -.03em; line-height: 1.15; margin: 0; }
+.playbook h2, .quick-reference h2, .event-essentials h2, .setup-section h2, .hospitality-section h2, .mission-section h2 { font-size: clamp(30px, 4vw, 48px); letter-spacing: -.03em; line-height: 1.15; margin: 0; }
 .playbook ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid #c9c6ba; }
 .playbook li { display: grid; grid-template-columns: 150px 1fr; gap: 18px; padding: 18px 0; border-bottom: 1px solid #c9c6ba; font-size: 14px; line-height: 1.45; }
 .playbook li strong { color: var(--forest); }
 .playbook li span { color: var(--muted); }
+
+.event-essentials { padding-bottom: 25px; }
+.event-heading { display: flex; justify-content: space-between; align-items: end; gap: 25px; margin-bottom: 30px; }
+.directions-link { flex: none; color: #fff; background: var(--forest); border-radius: 4px; padding: 12px 15px; text-decoration: none; font-size: 12px; font-weight: 850; }
+.event-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.event-grid article, .hospitality-grid article { padding: 20px; border: 1px solid #d3cec1; border-radius: 7px; background: rgba(255,255,255,.5); }
+.event-grid article > span, .hospitality-grid article > span { display: block; color: var(--red); text-transform: uppercase; letter-spacing: .11em; font-size: 9px; font-weight: 900; margin-bottom: 8px; }
+.event-grid strong, .hospitality-grid strong { display: block; color: var(--forest); font: 700 18px/1.25 var(--font-serif), Georgia, serif; }
+.event-grid p, .hospitality-grid p { color: var(--muted); font-size: 12px; line-height: 1.55; margin: 9px 0 0; }
+.arrival-details { margin-top: 12px; border: 1px solid #d3cec1; border-radius: 7px; background: var(--paper); }
+.arrival-details summary, .setup-panel summary { cursor: pointer; list-style: none; }
+.arrival-details summary::-webkit-details-marker, .setup-panel summary::-webkit-details-marker { display: none; }
+.arrival-details summary { padding: 16px 20px; color: var(--forest); font-size: 13px; font-weight: 850; }
+.arrival-details summary::after { content: "+"; float: right; font-size: 19px; line-height: .8; }
+.arrival-details[open] summary::after { content: "–"; }
+.arrival-details > div { display: grid; grid-template-columns: .8fr 1.2fr; gap: 35px; padding: 0 20px 20px; color: var(--muted); border-top: 1px solid #e1ddd2; font-size: 13px; line-height: 1.55; }
+.arrival-details ol { margin: 15px 0 0; padding-left: 20px; }
+
+.setup-section { display: grid; grid-template-columns: .68fr 1.32fr; gap: 55px; align-items: start; padding-top: 50px; }
+.setup-intro > p:not(.section-kicker) { color: var(--muted); font-size: 14px; line-height: 1.65; }
+.setup-panel { border-radius: 9px; color: #fff; background: var(--forest); box-shadow: 0 18px 45px rgba(24,63,42,.14); overflow: hidden; }
+.setup-panel summary { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 18px 22px; background: rgba(255,255,255,.08); }
+.setup-panel summary span { color: #b8ccbf; text-transform: uppercase; letter-spacing: .12em; font-size: 10px; font-weight: 900; }
+.setup-panel summary strong { text-align: right; font-size: 13px; }
+.setup-panel summary::after { content: "Edit"; color: var(--yellow); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 900; }
+.setup-panel[open] summary::after { content: "Close"; }
+#group-form { display: grid; gap: 22px; padding: 24px; }
+.setup-grid { display: grid; gap: 12px; }
+.primary-inputs { grid-template-columns: 1fr 1fr 1fr; }
+#group-form label { display: grid; gap: 7px; }
+#group-form label > span:first-child, #group-form legend { color: #b8ccbf; text-transform: uppercase; letter-spacing: .09em; font-size: 9px; font-weight: 900; }
+#group-form input, #group-form select { width: 100%; min-height: 43px; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); border-radius: 5px; padding: 9px 10px; font: 700 14px/1 var(--font-sans), sans-serif; }
+#group-form select { appearance: auto; }
+#group-form input:focus, #group-form select:focus { outline: 2px solid var(--yellow); outline-offset: 1px; }
+#group-form fieldset { min-width: 0; padding: 0; margin: 0; border: 0; }
+#group-form legend { margin-bottom: 10px; }
+.club-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.club-pair { display: grid; grid-template-columns: 1.25fr .75fr; gap: 7px; padding: 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 6px; }
+.input-with-unit { position: relative; display: block; }
+.input-with-unit input { padding-right: 34px !important; }
+.input-with-unit em { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #9eb1a3; font-style: normal; font-size: 10px; font-weight: 900; pointer-events: none; }
+.setup-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.setup-actions button { min-height: 42px; border: 0; border-radius: 4px; cursor: pointer; color: var(--ink); background: var(--yellow); padding: 11px 14px; font: 900 12px/1 var(--font-sans), sans-serif; }
+.setup-actions .secondary-button { color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.3); }
+#setup-status { flex-basis: 100%; min-height: 16px; color: #b8ccbf; font-size: 11px; }
 
 .hole-nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 22px; background: rgba(255,253,247,.96); border-block: 1px solid #d7d3c7; padding: 12px max(18px, calc((100vw - 1160px) / 2)); backdrop-filter: blur(12px); }
 .hole-nav > span { flex: none; text-transform: uppercase; letter-spacing: .12em; font-size: 10px; font-weight: 800; color: var(--muted); }
@@ -114,6 +161,7 @@ main:has(#hole-13:target) .hole-nav a[href="#hole-13"] { color: var(--ink); back
 .aerial-legend { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 12px; }
 .aerial-legend span { display: flex; align-items: center; gap: 7px; color: #dbe6de; background: rgba(255,255,255,.07); padding: 7px 9px; border-radius: 4px; font-size: 11px; }
 .aerial-legend b { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; color: #fff; background: var(--red); font-size: 10px; }
+.aerial-legend em { font-style: normal; }
 .map-side { display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; gap: 28px; padding: 48px 24px; border-left: 1px solid rgba(255,255,255,.12); }
 .map-side-title { color: #9eb1a3; text-align: center; text-transform: uppercase; letter-spacing: .12em; font-size: 9px; font-weight: 800; margin: 0 0 30px; }
 .hazards { display: grid; gap: 9px; width: 100%; }
@@ -128,6 +176,10 @@ main:has(#hole-13:target) .hole-nav a[href="#hole-13"] { color: var(--ink); back
 .hole-content { padding: 34px 38px 38px; }
 .hole-index { margin: 0 0 8px; color: var(--red); text-transform: uppercase; font-size: 10px; letter-spacing: .13em; font-weight: 800; }
 .hole-content h2 { margin: 0 0 28px; font-size: clamp(26px, 3.5vw, 42px); line-height: 1.1; letter-spacing: -.025em; }
+.personalized-plan { display: grid; grid-template-columns: 105px 1fr; gap: 4px 16px; align-items: baseline; margin: -8px 0 20px; padding: 16px 18px; color: #fff; background: var(--forest); border-left: 5px solid var(--yellow); border-radius: 5px; }
+.personalized-plan > span { grid-row: 1 / 3; color: var(--yellow); text-transform: uppercase; letter-spacing: .11em; font-size: 9px; font-weight: 900; }
+.personalized-plan strong { font-size: 15px; }
+.personalized-plan p { margin: 0; color: #c7d6cc; font-size: 12px; line-height: 1.5; }
 .strategy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .strategy-grid > div { display: flex; align-items: flex-start; gap: 14px; padding: 18px; background: #f2efe6; border-radius: 6px; }
 .strategy-grid .team-call { grid-column: 1 / -1; background: #f8edc5; }
@@ -142,6 +194,16 @@ main:has(#hole-13:target) .hole-nav a[href="#hole-13"] { color: var(--ink); back
 .quick-reference > div { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 30px; }
 .quick-reference p:not(.section-kicker) { margin: 0; padding: 18px; border: 1px solid #cbc7bb; background: rgba(255,255,255,.45); font-size: 13px; line-height: 1.5; }
 .quick-reference strong { display: block; color: var(--forest); margin-bottom: 5px; }
+.hospitality-section { display: grid; grid-template-columns: .7fr 1.3fr; gap: 55px; border-top: 1px solid #c9c6ba; }
+.hospitality-section > div:first-child > p:not(.section-kicker) { color: var(--muted); font-size: 14px; line-height: 1.65; }
+.hospitality-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.hospitality-grid .pending-stop { color: #fff; background: var(--forest); border-color: var(--forest); }
+.hospitality-grid .pending-stop strong { color: var(--yellow); }
+.hospitality-grid .pending-stop p { color: #c7d6cc; }
+.mission-section { max-width: none; color: #fff; background: #112b1d; padding-inline: max(24px, calc((100vw - 1112px) / 2)); }
+.mission-section h2 { color: var(--yellow); }
+.mission-section > p:not(.section-kicker) { max-width: 820px; color: #c7d6cc; font-size: 15px; line-height: 1.7; }
+.mission-section a { display: inline-block; margin-top: 10px; color: var(--ink); background: var(--yellow); padding: 10px 13px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 900; }
 .source-note { color: #d4dfd7; background: var(--forest); max-width: none; padding-inline: max(24px, calc((100vw - 1112px) / 2)); }
 .source-note h2 { color: #fff; font-size: 27px; margin: 0 0 16px; }
 .source-note p { max-width: 850px; font-size: 13px; line-height: 1.65; }
@@ -153,7 +215,15 @@ main:has(#hole-13:target) .hole-nav a[href="#hole-13"] { color: var(--ink); back
   .hero { padding-top: 42px; }
   .hero-copy { font-size: 16px; }
   .start-card { align-items: flex-start; flex-direction: column; }
+  .start-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
   .start-card a { width: 100%; text-align: center; }
+  .event-essentials, .setup-section, .hospitality-section { padding-block: 48px; }
+  .event-heading { align-items: flex-start; }
+  .event-grid { grid-template-columns: 1fr 1fr; }
+  .arrival-details > div { grid-template-columns: 1fr; gap: 0; }
+  .setup-section, .hospitality-section { grid-template-columns: 1fr; gap: 28px; }
+  .primary-inputs { grid-template-columns: 1fr 1fr; }
+  .club-grid { grid-template-columns: 1fr; }
   .playbook { grid-template-columns: 1fr; gap: 32px; padding-block: 50px; }
   .playbook li { grid-template-columns: 125px 1fr; }
   .hole-nav { display: block; padding-block: 10px; }
@@ -175,15 +245,29 @@ main:has(#hole-13:target) .hole-nav a[href="#hole-13"] { color: var(--ink); back
   .aerial-legend { gap: 6px; }
   .aerial-legend span { font-size: 10px; padding: 6px 7px; }
   .hole-content { padding: 25px 20px; }
+  .personalized-plan { grid-template-columns: 1fr; gap: 5px; }
+  .personalized-plan > span { grid-row: auto; }
   .strategy-grid { grid-template-columns: 1fr; }
   .strategy-grid .team-call { grid-column: auto; }
   .hole-card footer { padding: 14px 20px; }
   .hole-card footer span { max-width: 65%; }
   .quick-reference > div { grid-template-columns: 1fr 1fr; }
+  .hospitality-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 430px) {
   h1 { font-size: 42px; }
+  .event-heading { display: grid; }
+  .directions-link { width: max-content; }
+  .event-grid { grid-template-columns: 1fr; }
+  .primary-inputs { grid-template-columns: 1fr; }
+  .setup-panel summary { display: grid; gap: 7px; }
+  .setup-panel summary strong { text-align: left; }
+  .setup-panel summary::after { position: absolute; right: 24px; }
+  #group-form { padding: 18px 14px; }
+  .club-pair { grid-template-columns: 1.2fr .8fr; }
+  .setup-actions button { width: 100%; }
+  .start-actions { grid-template-columns: 1fr; }
   .holes { padding-inline: 10px; }
   .hole-meta { gap: 5px; padding-inline: 6px; }
   .hole-meta strong { font-size: 12px; }
