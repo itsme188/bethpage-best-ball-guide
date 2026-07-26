@@ -41,6 +41,88 @@ const holes: Hole[] = [
 
 const order = [14, 15, 16, 17, 18, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
+type MapPoint = { x: number; y: number };
+
+const aerialRoutes: Record<number, MapPoint[]> = {
+  1: [{ x: 56.9, y: 88.4 }, { x: 36.2, y: 31.9 }, { x: 56.9, y: 11.6 }],
+  2: [{ x: 46.3, y: 88.3 }, { x: 57.5, y: 36.2 }, { x: 46.3, y: 11.7 }],
+  3: [{ x: 50, y: 84.4 }, { x: 50, y: 15.6 }],
+  4: [{ x: 45.7, y: 89.1 }, { x: 55.5, y: 46.0 }, { x: 53.0, y: 16.9 }, { x: 45.7, y: 10.9 }],
+  5: [{ x: 49.9, y: 88.0 }, { x: 50.2, y: 40.4 }, { x: 49.9, y: 12.0 }],
+  6: [{ x: 47.3, y: 88.5 }, { x: 55.4, y: 30.4 }, { x: 47.3, y: 11.5 }],
+  7: [{ x: 58.1, y: 88.3 }, { x: 31.6, y: 45.6 }, { x: 52.2, y: 17.6 }, { x: 58.1, y: 11.7 }],
+  8: [{ x: 50, y: 83.8 }, { x: 50, y: 16.2 }],
+  9: [{ x: 42.5, y: 88.4 }, { x: 65.0, y: 37.8 }, { x: 42.5, y: 11.6 }],
+  10: [{ x: 48.5, y: 88.5 }, { x: 52.9, y: 41.1 }, { x: 48.5, y: 11.5 }],
+  11: [{ x: 49.3, y: 87.8 }, { x: 51.5, y: 35.9 }, { x: 49.3, y: 12.2 }],
+  12: [{ x: 43.0, y: 88.1 }, { x: 64.1, y: 41.4 }, { x: 43.0, y: 11.9 }],
+  13: [{ x: 51.0, y: 89.3 }, { x: 48.0, y: 50.4 }, { x: 50.0, y: 20.6 }, { x: 51.0, y: 10.7 }],
+  14: [{ x: 50, y: 82.2 }, { x: 50, y: 17.8 }],
+  15: [{ x: 47.2, y: 88.0 }, { x: 55.6, y: 40.3 }, { x: 47.2, y: 12.0 }],
+  16: [{ x: 48.4, y: 88.3 }, { x: 53.1, y: 39.6 }, { x: 48.4, y: 11.7 }],
+  17: [{ x: 50, y: 84.0 }, { x: 50, y: 16.0 }],
+  18: [{ x: 50.2, y: 87.6 }, { x: 49.6, y: 35.2 }, { x: 50.2, y: 12.4 }],
+};
+
+const routeLegYards: Record<number, number[]> = {
+  1: [300, 131], 2: [260, 127], 3: [236], 4: [285, 190, 53],
+  5: [300, 179], 6: [300, 102], 7: [295, 200, 47], 8: [211],
+  9: [300, 176], 10: [310, 194], 11: [300, 138], 12: [310, 210],
+  13: [300, 230, 77], 14: [162], 15: [300, 181], 16: [310, 179],
+  17: [206], 18: [290, 126],
+};
+
+const targetNudges: Record<number, number[]> = {
+  1: [-5], 2: [-5], 4: [-6, -4], 5: [-6], 6: [0], 7: [-4, -4],
+  9: [5], 10: [0], 11: [4], 12: [-5], 13: [4, 0], 15: [5], 16: [4], 18: [0],
+};
+
+function between(a: MapPoint, b: MapPoint, ratio: number): MapPoint {
+  const t = Math.max(0, Math.min(1, ratio));
+  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+}
+
+function shotPlan(hole: Hole) {
+  const route = aerialRoutes[hole.n];
+  const pin = route[route.length - 1];
+  const playingYards = Math.round(hole.yards + hole.adjust);
+
+  if (hole.par === 3) {
+    return {
+      points: [route[0], pin],
+      targets: [{ point: pin, label: `${playingYards} yd · pin` }],
+    };
+  }
+
+  const teeTarget = [2, 5, 6, 9].includes(hole.n) ? 180 : 225;
+  const driveBase = between(route[0], route[1], teeTarget / routeLegYards[hole.n][0]);
+  const drive = { ...driveBase, x: driveBase.x + (targetNudges[hole.n]?.[0] ?? 0) };
+
+  if (hole.par === 5) {
+    const layupCarry = 178;
+    const yardsRemainingToFirstBend = routeLegYards[hole.n][0] - teeTarget;
+    const yardsIntoSecondLeg = layupCarry - yardsRemainingToFirstBend;
+    const layupBase = between(route[1], route[2], yardsIntoSecondLeg / routeLegYards[hole.n][1]);
+    const layup = { ...layupBase, x: layupBase.x + (targetNudges[hole.n]?.[1] ?? 0) };
+    return {
+      points: [route[0], drive, layup, pin],
+      targets: [
+        { point: drive, label: `${teeTarget} yd · driver` },
+        { point: layup, label: `175–180 yd · layup` },
+        { point: pin, label: "Center green" },
+      ],
+    };
+  }
+
+  return {
+    points: [route[0], drive, pin],
+    targets: [
+      { point: drive, label: teeTarget === 180 ? "175–180 yd · 3W" : "220–230 yd · driver" },
+      { point: pin, label: "Center green" },
+    ],
+  };
+}
+
 function PinMap({ hole }: { hole: Hole }) {
   const x = hole.side === "L" ? 50 - hole.sideYards * 2 : 50 + hole.sideYards * 2;
   const y = 88 - (hole.on / hole.depth) * 72;
@@ -54,16 +136,57 @@ function PinMap({ hole }: { hole: Hole }) {
 }
 
 function CourseMap({ hole }: { hole: Hole }) {
+  const plan = shotPlan(hole);
+  const mapCanvas = (expanded = false) => (
+    <div className={`course-map ${expanded ? "expanded-map" : ""}`}>
+      <img src={`/aerials/hole-${hole.n}.webp`} alt={`Aerial map of Bethpage Black hole ${hole.n}, oriented from tee to green`} />
+      <span className="map-shade" />
+      {plan.points.slice(0, -1).map((start, index) => {
+        const end = plan.points[index + 1];
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        return (
+          <span
+            className="shot-line"
+            key={`${start.x}-${start.y}`}
+            style={{
+              left: `${start.x}%`,
+              top: `${start.y}%`,
+              width: `${Math.hypot(dx, dy)}%`,
+              transform: `rotate(${Math.atan2(dy, dx) * 180 / Math.PI}deg)`,
+            }}
+          />
+        );
+      })}
+      <span className="map-tee" style={{ left: `${plan.points[0].x}%`, top: `${plan.points[0].y}%` }}>T</span>
+      {plan.targets.map((target, index) => (
+        <span className={`shot-target target-${index + 1}`} style={{ left: `${target.point.x}%`, top: `${target.point.y}%` }} key={target.label}>
+          {index + 1}
+        </span>
+      ))}
+      <span className="imagery-credit">Esri · Maxar</span>
+    </div>
+  );
+
   return (
-    <div className={`course-map shape-${hole.shape}`} aria-hidden="true">
-      <span className="tee-dot" />
-      <span className="fairway one" />
-      <span className="fairway two" />
-      <span className="map-green" />
-      <span className="bunker b1" />
-      <span className="bunker b2" />
-      {hole.par === 3 && <span className="flight-line" />}
-      {hole.n === 8 && <span className="water" />}
+    <div className="aerial-wrap">
+      {mapCanvas()}
+      <input className="map-zoom-toggle" type="checkbox" id={`zoom-map-${hole.n}`} />
+      <label className="map-open" htmlFor={`zoom-map-${hole.n}`}>Expand aerial ↗</label>
+      <div className="map-modal" role="dialog" aria-label={`Expanded aerial map of hole ${hole.n}`}>
+        <label className="map-close" htmlFor={`zoom-map-${hole.n}`}>Close ×</label>
+        {mapCanvas(true)}
+        <div className="aerial-legend expanded-legend">
+          {plan.targets.map((target, index) => (
+            <span key={target.label}><b>{index + 1}</b>{target.label}</span>
+          ))}
+        </div>
+      </div>
+      <div className="aerial-legend">
+        {plan.targets.map((target, index) => (
+          <span key={target.label}><b>{index + 1}</b>{target.label}</span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -120,11 +243,13 @@ export default function Home() {
 
             <div className="hole-visuals">
               <CourseMap hole={hole} />
-              <div className="visual-note">
-                <p>Schematic play line</p>
+              <div className="map-side">
+                <div>
+                  <p className="map-side-title">Tomorrow&apos;s pin</p>
+                  <PinMap hole={hole} />
+                </div>
                 <div className="hazards">{hole.hazards.map((h) => <span key={h}>{h}</span>)}</div>
               </div>
-              <PinMap hole={hole} />
             </div>
 
             <div className="hole-content">
@@ -158,8 +283,8 @@ export default function Home() {
       <section className="source-note">
         <h2>Yardage & pin notes</h2>
         <p>Yellow-tee hole yardages use the published forward-tee scorecard (6,223 yards). The current USGA listing is 6,207 yards, so tournament markers may differ — the marker on the tee and your rangefinder always win. “Pin vs center” comes directly from tomorrow’s supplied pin sheet; blank pin adjustments on holes 6 and 9 calculate to approximately center.</p>
-        <p className="links"><a href="https://ncrdb.usga.org/courseTeeInfo?CourseID=14914" target="_blank" rel="noreferrer">USGA rating</a><a href="https://www.allgolfholes.com/courses/new-york/bethpage-state-park-black-course" target="_blank" rel="noreferrer">Course & scorecard</a><a href="https://golfcourseintel.com/golf-improvement-strategy-high-handicap/" target="_blank" rel="noreferrer">Amateur strategy</a></p>
-        <small>Weather snapshot checked July 26 for Bethpage, NY. Conditions can change. Course schematics are strategy aids, not surveyed maps.</small>
+        <p className="links"><a href="https://ncrdb.usga.org/courseTeeInfo?CourseID=14914" target="_blank" rel="noreferrer">USGA rating</a><a href="https://www.allgolfholes.com/courses/new-york/bethpage-state-park-black-course" target="_blank" rel="noreferrer">Course & scorecard</a><a href="https://www.provisualizer.com/courses/bethpageblack.php" target="_blank" rel="noreferrer">Course coordinates</a><a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9" target="_blank" rel="noreferrer">Aerial imagery</a></p>
+        <small>Weather snapshot checked July 26 for Bethpage, NY. Conditions can change. Aerial imagery © Esri, Maxar, Earthstar Geographics, and the GIS User Community. Target overlays are personalized strategy suggestions, not surveyed yardage markers.</small>
       </section>
     </main>
   );
