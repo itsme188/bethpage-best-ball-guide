@@ -28,7 +28,13 @@ test("renders the complete tournament guide", async () => {
   assert.match(html, /name="start"/);
   assert.match(html, /name="driver"/);
   assert.match(html, /name="longName"/);
+  assert.match(html, /id="rain-widget"/);
+  assert.match(html, /Donate to Ohel/);
+  assert.match(html, /data-danger-window/);
   assert.match(html, /Hospitality along the route/);
+  assert.match(html, /Muscat hot dogs/);
+  assert.match(html, /Sushi Tokyo sushi/);
+  assert.match(html, /Holy Schnitzel mini burgers/);
   assert.match(html, /Why we play/);
   assert.equal((html.match(/class="hole-card"/g) ?? []).length, 18);
   assert.doesNotMatch(html, /codex-preview|Building your site|react-loading-skeleton/i);
@@ -39,6 +45,10 @@ test("ships the client-side personalization engine and aerial assets", async () 
   assert.match(script, /bethpage-group-profile-v2/);
   assert.match(script, /orderedHoles/);
   assert.match(script, /handicapCall/);
+  assert.match(script, /dangerZones/);
+  assert.match(script, /updateDangerWindow/);
+  assert.match(script, /forecastHourly/);
+  assert.match(script, /60 \* 60 \* 1000/);
   assert.match(script, /pointAlongRoute/);
   assert.match(script, /navigator\.clipboard/);
   assert.match(script, /URLSearchParams/);

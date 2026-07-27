@@ -46,6 +46,75 @@
     9: [5], 10: [0], 11: [4], 12: [-5], 13: [4, 0], 15: [5], 16: [4], 18: [0],
   };
 
+  const dangerZones = {
+    1: [
+      { from: 190, to: 285, type: "rough", label: "Trees and blocking rough on the right" },
+    ],
+    2: [
+      { from: 165, to: 230, type: "rough", label: "Dogleg corner and trees right" },
+      { from: 300, to: 315, type: "sand", label: "Right-side bunker near the approach" },
+    ],
+    3: [
+      { from: 105, to: 128, type: "sand", label: "Deep front bunker" },
+      { from: 145, to: 165, type: "rough", label: "Long-left falloff" },
+    ],
+    4: [
+      { from: 190, to: 255, type: "sand", label: "Glacier Bunker and heavy right rough frame the landing area" },
+      { from: 360, to: 410, type: "sand", label: "Cross-bunker wall on the next shot" },
+    ],
+    5: [
+      { from: 190, to: 250, type: "sand", label: "Diagonal cross-bunker line" },
+      { from: 175, to: 260, type: "rough", label: "Trees and rough tighten the right side" },
+    ],
+    6: [
+      { from: 195, to: 215, type: "sand", label: "Fairway bunker at the pinch point" },
+    ],
+    7: [
+      { from: 215, to: 285, type: "rough", label: "Trees and rough narrow the right side" },
+      { from: 315, to: 335, type: "sand", label: "Layup bunker farther ahead" },
+    ],
+    8: [
+      { from: 0, to: 135, type: "carry", label: "Pond is a forced carry short-left" },
+      { from: 135, to: 170, type: "sand", label: "Right greenside bunker" },
+    ],
+    9: [
+      { from: 155, to: 215, type: "sand", label: "Diagonal bunker on the inside-left" },
+    ],
+    10: [
+      { from: 225, to: 245, type: "sand", label: "Fairway bunker complex" },
+      { from: 175, to: 275, type: "rough", label: "Narrow rough-lined corridor" },
+    ],
+    11: [
+      { from: 180, to: 275, type: "rough", label: "Thick rough tightens both sides" },
+      { from: 295, to: 320, type: "sand", label: "Fairway bunkers farther ahead" },
+    ],
+    12: [
+      { from: 0, to: 150, type: "carry", label: "Opening trouble requires a committed carry" },
+      { from: 215, to: 260, type: "sand", label: "Right-side bunker line" },
+    ],
+    13: [
+      { from: 190, to: 255, type: "sand", label: "Inside-left bunker complex" },
+      { from: 175, to: 270, type: "rough", label: "Narrow layup corridor" },
+    ],
+    14: [
+      { from: 105, to: 145, type: "sand", label: "Bunkers short-left and right" },
+    ],
+    15: [
+      { from: 185, to: 285, type: "rough", label: "Heavy rough pinches both sides" },
+    ],
+    16: [
+      { from: 200, to: 250, type: "sand", label: "Left fairway bunker" },
+      { from: 180, to: 280, type: "rough", label: "Rough tightens the downhill landing area" },
+    ],
+    17: [
+      { from: 145, to: 180, type: "sand", label: "Front bunker complex" },
+    ],
+    18: [
+      { from: 195, to: 215, type: "sand", label: "Fairway bunkers form a narrow chute" },
+      { from: 175, to: 250, type: "rough", label: "Rough pinches both sides" },
+    ],
+  };
+
   const positionClubHoles = new Set([2, 5, 6, 9]);
   const storageKey = "bethpage-group-profile-v2";
   const form = document.querySelector("#group-form");
@@ -238,6 +307,48 @@
     };
   }
 
+  function updateDangerWindow(card, profile) {
+    const hole = Number(card.dataset.hole);
+    const par = Number(card.dataset.par);
+    const playing = Math.round(Number(card.dataset.yards) + Number(card.dataset.adjust));
+    const positional = positionClubHoles.has(hole);
+    const clubName = positional ? profile.longName : "driver";
+    const reference = par === 3 ? playing : (positional ? profile.long : profile.driver);
+    const low = Math.round(reference * 0.8);
+    const high = Math.round(reference * 1.2);
+    const zones = dangerZones[hole] || [];
+    const overlaps = zones.filter((zone) => zone.from <= high && zone.to >= low);
+    const forcedCarries = par !== 3
+      ? zones.filter((zone) => zone.type === "carry" && !overlaps.includes(zone))
+      : [];
+    const title = card.querySelector("[data-danger-title]");
+    const list = card.querySelector("[data-danger-list]");
+
+    title.textContent = par === 3
+      ? `${low}–${high} yd shot band around the ${playing}-yard pin`
+      : `${low}–${high} yd · ${clubName} total-distance window`;
+
+    const notes = overlaps.map((zone) => {
+      const range = zone.from === 0 ? `Carry by ~${zone.to} yd` : `~${zone.from}–${zone.to} yd`;
+      return { type: zone.type, text: `${range}: ${zone.label}` };
+    });
+    forcedCarries.forEach((zone) => notes.unshift({ type: zone.type, text: `Forced carry: ${zone.label} (clear by roughly ${zone.to} yd)` }));
+
+    if (!notes.length) {
+      notes.push({
+        type: "clear",
+        text: `No mapped sand or water overlaps ${low}–${high} yd; fairway width and rough are still the priority.`,
+      });
+    }
+
+    list.replaceChildren(...notes.map((note) => {
+      const item = document.createElement("li");
+      item.className = `danger-${note.type}`;
+      item.textContent = note.text;
+      return item;
+    }));
+  }
+
   function updateCanvas(card, plan) {
     card.querySelectorAll(".course-map").forEach((canvas) => {
       canvas.querySelectorAll("[data-shot-line]").forEach((line, index) => {
@@ -282,8 +393,91 @@
       const plan = planFor(card, profile);
       card.querySelector("[data-plan-title]").textContent = plan.title;
       card.querySelector("[data-plan-copy]").textContent = plan.copy;
+      updateDangerWindow(card, profile);
       updateCanvas(card, plan);
     });
+  }
+
+  const weatherPointUrl = "https://api.weather.gov/points/40.744,-73.456";
+  const eventDate = "2026-07-27";
+
+  function datePartsInNewYork(date) {
+    return Object.fromEntries(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "numeric",
+        hourCycle: "h23",
+      }).formatToParts(date).filter((part) => part.type !== "literal").map((part) => [part.type, part.value]),
+    );
+  }
+
+  function renderRainForecast(periods) {
+    const hours = periods.map((period) => {
+      const parts = datePartsInNewYork(new Date(period.startTime));
+      return { ...period, localDate: `${parts.year}-${parts.month}-${parts.day}`, localHour: Number(parts.hour) };
+    }).filter((period) => period.localDate === eventDate && period.localHour >= 8 && period.localHour <= 16);
+
+    if (!hours.length) throw new Error("Tournament-day hourly forecast is not available yet.");
+
+    const container = document.querySelector("#rain-hours");
+    const summary = document.querySelector("#rain-summary");
+    const updated = document.querySelector("#rain-updated");
+    const peak = hours.reduce((highest, period) =>
+      (period.probabilityOfPrecipitation?.value || 0) > (highest.probabilityOfPrecipitation?.value || 0) ? period : highest,
+    hours[0]);
+    const peakChance = peak.probabilityOfPrecipitation?.value || 0;
+    const peakLabel = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric" }).format(new Date(peak.startTime));
+
+    summary.textContent = peakChance >= 50
+      ? `Rain is a factor: peak chance ${peakChance}% at ${peakLabel}`
+      : peakChance >= 25
+        ? `Keep a rain layer handy: peak chance ${peakChance}% at ${peakLabel}`
+        : `Low rain risk: peak chance ${peakChance}% at ${peakLabel}`;
+
+    container.replaceChildren(...hours.map((period) => {
+      const chance = period.probabilityOfPrecipitation?.value || 0;
+      const hour = document.createElement("span");
+      hour.className = `rain-hour ${chance >= 50 ? "rain-high" : chance >= 25 ? "rain-medium" : ""}`;
+      const time = document.createElement("b");
+      time.textContent = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric" }).format(new Date(period.startTime));
+      const bar = document.createElement("i");
+      bar.style.setProperty("--rain", `${Math.max(4, chance)}%`);
+      const value = document.createElement("strong");
+      value.textContent = `${chance}%`;
+      const temp = document.createElement("small");
+      temp.textContent = `${period.temperature}°`;
+      hour.title = `${period.shortForecast}; ${chance}% rain; ${period.temperature}°${period.temperatureUnit}`;
+      hour.append(time, bar, value, temp);
+      return hour;
+    }));
+    updated.innerHTML = `Updated ${new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit" }).format(new Date())} from <a href="https://forecast.weather.gov/MapClick.php?lat=40.744&lon=-73.456" target="_blank" rel="noreferrer">Weather.gov</a>. Refreshes hourly.`;
+  }
+
+  function renderWeatherError() {
+    const summary = document.querySelector("#rain-summary");
+    const container = document.querySelector("#rain-hours");
+    const updated = document.querySelector("#rain-updated");
+    if (!summary || !container || !updated) return;
+    summary.textContent = "Live rain forecast is temporarily unavailable";
+    container.innerHTML = '<a class="weather-fallback" href="https://forecast.weather.gov/MapClick.php?lat=40.744&lon=-73.456" target="_blank" rel="noreferrer">Open the Bethpage forecast ↗</a>';
+    updated.textContent = "Try again when you reopen or refocus this page.";
+  }
+
+  async function updateWeather() {
+    try {
+      const pointResponse = await fetch(weatherPointUrl, { headers: { Accept: "application/geo+json" } });
+      if (!pointResponse.ok) throw new Error(`Weather point request failed: ${pointResponse.status}`);
+      const point = await pointResponse.json();
+      const hourlyResponse = await fetch(point.properties.forecastHourly, { headers: { Accept: "application/geo+json" } });
+      if (!hourlyResponse.ok) throw new Error(`Hourly forecast request failed: ${hourlyResponse.status}`);
+      const hourly = await hourlyResponse.json();
+      renderRainForecast(hourly.properties.periods || []);
+    } catch {
+      renderWeatherError();
+    }
   }
 
   function updateProfileCopy(profile) {
@@ -343,6 +537,11 @@
   const initial = applyProfile(urlProfile || storedProfile());
   setupPanel.open = !urlProfile && !localStorage.getItem(storageKey);
   fillForm(initial);
+  updateWeather();
+  window.setInterval(updateWeather, 60 * 60 * 1000);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") updateWeather();
+  });
   };
 
   if (document.readyState === "complete") {

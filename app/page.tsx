@@ -41,6 +41,19 @@ const holes: Hole[] = [
 
 const order = [14, 15, 16, 17, 18, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
+const foodStops: Record<number, string> = {
+  1: "Muscat hot dogs",
+  2: "Smash House poppers & wings · shared with Hole 3",
+  3: "Smash House poppers & wings · shared with Hole 2",
+  5: "Sunflower Smoothie Bar + Doma tuna tartare · meeting point with Holes 6 & 12",
+  6: "Sunflower Smoothie Bar + Doma tuna tartare · meeting point with Holes 5 & 12",
+  8: "Rita’s ices",
+  10: "Chimichurri beef jerky & salamis",
+  12: "Sunflower Smoothie Bar + Doma tuna tartare · meeting point with Holes 5 & 6",
+  14: "Sushi Tokyo sushi",
+  17: "Shot table + Holy Schnitzel mini burgers",
+};
+
 type MapPoint = { x: number; y: number };
 
 const aerialRoutes: Record<number, MapPoint[]> = {
@@ -206,9 +219,29 @@ export default function Home() {
             <a href="#group-setup" className="customize-link">Customize group</a>
           </div>
         </div>
-        <div className="weather-strip">
-          <span className="weather-icon">☀</span>
-          <div><strong>80°F & mostly sunny at 11</strong><small>Storm chance rises around 4 PM. Hydrate early; pack a light rain layer.</small></div>
+        <div className="rain-widget" id="rain-widget" aria-live="polite">
+          <div className="rain-heading">
+            <span className="rain-icon" aria-hidden="true">☂</span>
+            <div><span>Tomorrow · 8 AM–4 PM</span><strong id="rain-summary">Checking the hourly rain forecast…</strong></div>
+          </div>
+          <div className="rain-hours" id="rain-hours" aria-label="Hourly rain chances">
+            <span className="rain-loading">Loading Weather.gov…</span>
+          </div>
+          <small id="rain-updated">Updates hourly from the National Weather Service.</small>
+        </div>
+      </section>
+
+      <section className="mission-section" aria-labelledby="mission-title">
+        <div>
+          <p className="section-kicker">Why we play</p>
+          <h2 id="mission-title">More than a round of golf.</h2>
+          <p>Today supports Ohel’s care and critical services for children, adults, and families facing mental-health challenges, developmental disabilities, family crises, domestic violence, aging, and trauma — locally and through trauma-response work in Israel.</p>
+        </div>
+        <div className="mission-action">
+          <strong>Turn today’s round into lasting impact.</strong>
+          <p>Every gift helps Ohel continue essential care for people and families who rely on it.</p>
+          <a className="donate-button" href="https://www.ohelfamily.org/donate/" target="_blank" rel="noreferrer">Donate to Ohel ↗</a>
+          <a className="impact-link" href="https://www.ohelfamily.org/" target="_blank" rel="noreferrer">See Ohel’s impact</a>
         </div>
       </section>
 
@@ -355,6 +388,20 @@ export default function Home() {
                 <strong data-plan-title>Loading your group plan…</strong>
                 <p data-plan-copy>Club and remaining-yardage estimates will appear here.</p>
               </div>
+              <div className="danger-window" data-danger-window>
+                <div>
+                  <span>±20% landing window</span>
+                  <strong data-danger-title>Calculating your landing zone…</strong>
+                </div>
+                <ul data-danger-list><li>Course danger notes will appear here.</li></ul>
+                <small>Typical total-distance estimate. Tee markers, conditions, caddie and rangefinder always win.</small>
+              </div>
+              {foodStops[hole.n] && (
+                <aside className="hole-stop">
+                  <span>Food stop</span>
+                  <strong>{foodStops[hole.n]}</strong>
+                </aside>
+              )}
               <div className="strategy-grid">
                 <div><span className="strategy-icon">T</span><p><strong>Off the tee</strong>{hole.tee}</p></div>
                 <div><span className="strategy-icon">G</span><p><strong>Into the green</strong>{hole.approach}</p></div>
@@ -384,39 +431,27 @@ export default function Home() {
         <div>
           <p className="section-kicker">Food, drinks & recovery</p>
           <h2 id="hospitality-title">Hospitality along the route</h2>
-          <p>Confirmed hole-by-hole food and drink locations will appear inside the playing order as soon as the final route is available.</p>
+          <p>Stops appear inside each hole card and automatically follow your selected starting hole. Snacks are spread throughout the course.</p>
         </div>
         <div className="hospitality-grid">
-          <article>
-            <span>Before play</span>
-            <strong>Breakfast at the clubhouse</strong>
-            <p>Available after registration and the parking-lot shuttle, beginning at 9:30 AM.</p>
-          </article>
-          <article className="pending-stop">
-            <span>On the course</span>
-            <strong>Food and drink stops</strong>
-            <p>Hole locations and offerings are being finalized. This guide is ready to place them in each group’s custom route.</p>
-          </article>
-          <article>
-            <span>After the round</span>
-            <strong>19th Hole Recovery Lounge</strong>
-            <p>Complimentary IV hydration from Wellspring Drips, plus massage or chiropractic care from Long Island Spine & Sport.</p>
-          </article>
+          <article><span>Hole 1</span><strong>Muscat hot dogs</strong></article>
+          <article><span>Holes 2 / 3</span><strong>Smash House</strong><p>Poppers and wings.</p></article>
+          <article><span>Holes 5 / 6 / 12</span><strong>Sunflower + Doma</strong><p>Smoothie bar and tuna tartare at the shared meeting point.</p></article>
+          <article><span>Hole 8</span><strong>Rita’s ices</strong></article>
+          <article><span>Hole 10</span><strong>Chimichurri</strong><p>Beef jerky and salamis.</p></article>
+          <article><span>Hole 14</span><strong>Sushi Tokyo</strong><p>Sushi.</p></article>
+          <article><span>Hole 17</span><strong>Shot table + Holy Schnitzel</strong><p>Mini burgers.</p></article>
+          <article className="all-course-stop"><span>All course</span><strong>Snacks throughout</strong><p>Keep something small in the bag between larger stops.</p></article>
+          <article><span>After the round</span><strong>19th Hole Recovery Lounge</strong><p>Complimentary IV hydration from Wellspring Drips, plus massage or chiropractic care from Long Island Spine & Sport.</p></article>
         </div>
-      </section>
-
-      <section className="mission-section">
-        <p className="section-kicker">Why we play</p>
-        <h2>More than a round of golf.</h2>
-        <p>Today supports Ohel’s care and critical services for children, adults, and families facing mental-health challenges, developmental disabilities, family crises, domestic violence, aging, and trauma — locally and through trauma-response work in Israel.</p>
-        <a href="https://www.ohelfamily.org/" target="_blank" rel="noreferrer">Learn about Ohel’s impact ↗</a>
       </section>
 
       <section className="source-note">
         <h2>Yardage & pin notes</h2>
         <p>Yellow-tee hole yardages use the published forward-tee scorecard (6,223 yards). The current USGA listing is 6,207 yards, so tournament markers may differ — the marker on the tee and your rangefinder always win. “Pin vs center” comes directly from tomorrow’s supplied pin sheet; blank pin adjustments on holes 6 and 9 calculate to approximately center.</p>
-        <p className="links"><a href="https://ncrdb.usga.org/courseTeeInfo?CourseID=14914" target="_blank" rel="noreferrer">USGA rating</a><a href="https://www.allgolfholes.com/courses/new-york/bethpage-state-park-black-course" target="_blank" rel="noreferrer">Course & scorecard</a><a href="https://www.provisualizer.com/courses/bethpageblack.php" target="_blank" rel="noreferrer">Course coordinates</a><a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9" target="_blank" rel="noreferrer">Aerial imagery</a></p>
-        <small>Weather snapshot checked July 26 for Bethpage, NY. Conditions can change. Aerial imagery © Esri, Maxar, Earthstar Geographics, and the GIS User Community. Target overlays are personalized strategy suggestions, not surveyed yardage markers.</small>
+        <p>The ±20% window is based on your entered typical total distance. Hazard distances are planning estimates interpreted from course aerials and published hole guides, not surveyed carry numbers. Forced carries are called out separately.</p>
+        <p className="links"><a href="https://ncrdb.usga.org/courseTeeInfo?CourseID=14914" target="_blank" rel="noreferrer">USGA rating</a><a href="https://www.allgolfholes.com/courses/new-york/bethpage-state-park-black-course" target="_blank" rel="noreferrer">Course & hazard guide</a><a href="https://www.provisualizer.com/courses/bethpageblack.php" target="_blank" rel="noreferrer">Course coordinates</a><a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9" target="_blank" rel="noreferrer">Aerial imagery</a><a href="https://www.weather.gov/documentation/services-web-api" target="_blank" rel="noreferrer">Weather.gov API</a></p>
+        <small>Rain forecast updates hourly from the National Weather Service. Conditions can change. Aerial imagery © Esri, Maxar, Earthstar Geographics, and the GIS User Community. Target overlays are personalized strategy suggestions, not surveyed yardage markers.</small>
       </section>
     </main>
   );
