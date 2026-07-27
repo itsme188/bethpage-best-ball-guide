@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { Inter, Libre_Baskerville } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({ variable: "--font-sans", subsets: ["latin"] });
-const serif = Libre_Baskerville({ variable: "--font-serif", subsets: ["latin"], weight: ["400", "700"] });
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
@@ -22,12 +21,12 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       type: "website",
-      images: [{ url: `${origin}/og.png`, width: 1734, height: 907, alt: title }],
+      images: [{ url: `${origin}/og-event.png`, width: 1731, height: 909, alt: title }],
     },
-    twitter: { card: "summary_large_image", title, description, images: [`${origin}/og.png`] },
+    twitter: { card: "summary_large_image", title, description, images: [`${origin}/og-event.png`] },
   };
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body className={`${inter.variable} ${serif.variable}`}>{children}</body></html>;
+  return <html lang="en"><body className={inter.variable}>{children}</body></html>;
 }

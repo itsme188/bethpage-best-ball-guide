@@ -116,6 +116,18 @@
   };
 
   const positionClubHoles = new Set([2, 5, 6, 9]);
+  const foodStopNames = {
+    1: "Hot dogs",
+    2: "Poppers & wings",
+    3: "Poppers & wings",
+    5: "Smoothies & tuna tartare",
+    6: "Smoothies & tuna tartare",
+    8: "Rita’s ice",
+    10: "Jerky & salamis",
+    12: "Smoothies & tuna tartare",
+    14: "Sushi",
+    17: "Shots & mini burgers",
+  };
   const storageKey = "bethpage-group-profile-v2";
   const form = document.querySelector("#group-form");
   const holesContainer = document.querySelector(".holes");
@@ -218,7 +230,10 @@
       const link = document.createElement("a");
       link.href = `#hole-${hole}`;
       link.textContent = String(hole);
-      if (index === 0) link.className = "active";
+      if (index === 0) {
+        link.className = "active";
+        link.setAttribute("aria-current", "location");
+      }
       return link;
     }));
   }
@@ -481,7 +496,9 @@
   }
 
   function updateProfileCopy(profile) {
+    const firstFoodHole = orderedHoles(profile.start).find((hole) => foodStopNames[hole]);
     document.querySelector("#start-summary").textContent = `Hole ${profile.start} · 11:00 AM`;
+    document.querySelector("#first-food-summary").textContent = `Hole ${firstFoodHole} · ${foodStopNames[firstFoodHole]}`;
     document.querySelector("#start-round-link").href = `#hole-${profile.start}`;
     document.querySelector("#setup-summary").textContent = `Hole ${profile.start} · ${profile.hcp} HCP · ${profile.driver}-yard driver`;
     document.querySelector("#nav-profile").textContent = `Hole ${profile.start} start`;
@@ -528,10 +545,37 @@
     }
   });
 
+  function setActiveHole(activeHole) {
+    navLinks.querySelectorAll("a").forEach((link) => {
+      const active = Number(link.textContent) === activeHole;
+      link.classList.toggle("active", active);
+      if (active) {
+        link.setAttribute("aria-current", "location");
+        const linkStart = link.offsetLeft;
+        const linkEnd = linkStart + link.offsetWidth;
+        const visibleStart = navLinks.scrollLeft;
+        const visibleEnd = visibleStart + navLinks.clientWidth;
+        if (linkStart < visibleStart || linkEnd > visibleEnd) {
+          navLinks.scrollTo({ left: linkStart - (navLinks.clientWidth - link.offsetWidth) / 2, behavior: "smooth" });
+        }
+      } else link.removeAttribute("aria-current");
+    });
+  }
+
   window.addEventListener("hashchange", () => {
     const activeHole = Number(location.hash.replace("#hole-", ""));
-    navLinks.querySelectorAll("a").forEach((link) => link.classList.toggle("active", Number(link.textContent) === activeHole));
+    if (activeHole) setActiveHole(activeHole);
   });
+
+  if ("IntersectionObserver" in window) {
+    const holeObserver = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => Math.abs(a.boundingClientRect.top - 70) - Math.abs(b.boundingClientRect.top - 70))[0];
+      if (visible) setActiveHole(Number(visible.target.dataset.hole));
+    }, { rootMargin: "-70px 0px -68% 0px", threshold: [0, 0.05] });
+    holesContainer.querySelectorAll(".hole-card").forEach((card) => holeObserver.observe(card));
+  }
 
   const urlProfile = profileFromUrl();
   const initial = applyProfile(urlProfile || storedProfile());

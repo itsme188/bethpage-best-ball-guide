@@ -21,6 +21,7 @@ test("renders the complete tournament guide", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>Bethpage Black Best-Ball Field Guide<\/title>/i);
+  assert.match(html, /og-event\.png/);
   assert.match(html, /Event essentials/);
   assert.match(html, /Drive-through registration/);
   assert.match(html, /Set up your foursome/);
@@ -29,12 +30,14 @@ test("renders the complete tournament guide", async () => {
   assert.match(html, /name="driver"/);
   assert.match(html, /name="longName"/);
   assert.match(html, /id="rain-widget"/);
+  assert.match(html, /id="first-food-summary"/);
   assert.match(html, /Donate to Ohel/);
   assert.match(html, /data-danger-window/);
   assert.match(html, /Hospitality along the route/);
-  assert.match(html, /Muscat hot dogs/);
-  assert.match(html, /Sushi Tokyo sushi/);
-  assert.match(html, /Holy Schnitzel mini burgers/);
+  assert.match(html, /Muscat Catering logo/);
+  assert.match(html, /Sushi Tokyo logo/);
+  assert.match(html, /Holy Schnitzel logo/);
+  assert.match(html, /tip both caddies appropriately/i);
   assert.match(html, /Why we play/);
   assert.equal((html.match(/class="hole-card"/g) ?? []).length, 18);
   assert.doesNotMatch(html, /codex-preview|Building your site|react-loading-skeleton/i);
@@ -48,6 +51,10 @@ test("ships the client-side personalization engine and aerial assets", async () 
   assert.match(script, /dangerZones/);
   assert.match(script, /updateDangerWindow/);
   assert.match(script, /forecastHourly/);
+  assert.match(script, /foodStopNames/);
+  assert.match(script, /IntersectionObserver/);
+  assert.match(script, /aria-current/);
+  assert.match(script, /navLinks\.scrollTo/);
   assert.match(script, /60 \* 60 \* 1000/);
   assert.match(script, /pointAlongRoute/);
   assert.match(script, /navigator\.clipboard/);
@@ -58,4 +65,12 @@ test("ships the client-side personalization engine and aerial assets", async () 
       access(new URL(`../public/aerials/hole-${index + 1}.webp`, import.meta.url)),
     ),
   );
+
+  await Promise.all([
+    access(new URL("../public/event/tournament-lockup.png", import.meta.url)),
+    access(new URL("../public/event/teal-golf-ball.png", import.meta.url)),
+    access(new URL("../public/og-event.png", import.meta.url)),
+    ...["muscat", "smash-house", "sunflower", "doma", "ritas", "chimichurri", "sushi-tokyo", "holy-schnitzel"]
+      .map((name) => access(new URL(`../public/sponsors/${name}.png`, import.meta.url))),
+  ]);
 });

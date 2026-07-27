@@ -41,18 +41,54 @@ const holes: Hole[] = [
 
 const order = [14, 15, 16, 17, 18, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
-const foodStops: Record<number, string> = {
-  1: "Muscat hot dogs",
-  2: "Smash House poppers & wings · shared with Hole 3",
-  3: "Smash House poppers & wings · shared with Hole 2",
-  5: "Sunflower Smoothie Bar + Doma tuna tartare · meeting point with Holes 6 & 12",
-  6: "Sunflower Smoothie Bar + Doma tuna tartare · meeting point with Holes 5 & 12",
-  8: "Rita’s ices",
-  10: "Chimichurri beef jerky & salamis",
-  12: "Sunflower Smoothie Bar + Doma tuna tartare · meeting point with Holes 5 & 6",
-  14: "Sushi Tokyo sushi",
-  17: "Shot table + Holy Schnitzel mini burgers",
+type Sponsor = { name: string; logo: string };
+type FoodStop = { offering: string; note?: string; sponsors: Sponsor[] };
+
+const sponsor = {
+  muscat: { name: "Muscat Catering", logo: "/sponsors/muscat.png" },
+  smash: { name: "Smash House", logo: "/sponsors/smash-house.png" },
+  sunflower: { name: "Sunflower", logo: "/sponsors/sunflower.png" },
+  doma: { name: "Doma Land + Sea", logo: "/sponsors/doma.png" },
+  ritas: { name: "Rita’s of Lawrence", logo: "/sponsors/ritas.png" },
+  chimichurri: { name: "Chimichurri Charcoal Chicken", logo: "/sponsors/chimichurri.png" },
+  sushi: { name: "Sushi Tokyo", logo: "/sponsors/sushi-tokyo.png" },
+  schnitzel: { name: "Holy Schnitzel", logo: "/sponsors/holy-schnitzel.png" },
 };
+
+const foodStops: Record<number, FoodStop> = {
+  1: { offering: "Hot dogs", sponsors: [sponsor.muscat] },
+  2: { offering: "Poppers & wings", note: "Shared stop with Hole 3", sponsors: [sponsor.smash] },
+  3: { offering: "Poppers & wings", note: "Shared stop with Hole 2", sponsors: [sponsor.smash] },
+  5: { offering: "Smoothies & tuna tartare", note: "Meeting point with Holes 6 & 12", sponsors: [sponsor.sunflower, sponsor.doma] },
+  6: { offering: "Smoothies & tuna tartare", note: "Meeting point with Holes 5 & 12", sponsors: [sponsor.sunflower, sponsor.doma] },
+  8: { offering: "Italian ice", sponsors: [sponsor.ritas] },
+  10: { offering: "Beef jerky & salamis", sponsors: [sponsor.chimichurri] },
+  12: { offering: "Smoothies & tuna tartare", note: "Meeting point with Holes 5 & 6", sponsors: [sponsor.sunflower, sponsor.doma] },
+  14: { offering: "Sushi", sponsors: [sponsor.sushi] },
+  17: { offering: "Shot table & mini burgers", sponsors: [sponsor.schnitzel] },
+};
+
+const hospitalityStops = [
+  { holes: "Hole 1", ...foodStops[1] },
+  { holes: "Holes 2 / 3", ...foodStops[2], note: undefined },
+  { holes: "Holes 5 / 6 / 12", ...foodStops[5], note: "Shared meeting point" },
+  { holes: "Hole 8", ...foodStops[8] },
+  { holes: "Hole 10", ...foodStops[10] },
+  { holes: "Hole 14", ...foodStops[14] },
+  { holes: "Hole 17", ...foodStops[17] },
+];
+
+function SponsorLogos({ sponsors, compact = false }: { sponsors: Sponsor[]; compact?: boolean }) {
+  return (
+    <div className={`sponsor-logos ${compact ? "compact" : ""}`}>
+      {sponsors.map((item) => (
+        <span className="sponsor-logo" key={item.name}>
+          <img src={item.logo} alt={`${item.name} logo`} />
+        </span>
+      ))}
+    </div>
+  );
+}
 
 type MapPoint = { x: number; y: number };
 
@@ -209,11 +245,16 @@ export default function Home() {
   return (
     <main>
       <section className="hero">
-        <div className="eyebrow">Ohel Rosemil Healthcare Golf Tournament · July 27, 2026</div>
-        <h1>Bethpage Black<br /><span>Best-Ball Field Guide</span></h1>
+        <img className="hero-ball" src="/event/teal-golf-ball.png" alt="" aria-hidden="true" />
+        <img className="event-lockup" src="/event/tournament-lockup.png" alt="Ohel Rosemil Healthcare Golf Tournament" />
+        <div className="eyebrow">Bethpage Black · July 27, 2026</div>
+        <h1>Everything you need,<br /><span>hole by hole.</span></h1>
         <p className="hero-copy" id="hero-profile">Yellow tees · personalized for your starting hole, group handicap, and reliable club distances.</p>
         <div className="start-card">
-          <div><span className="start-label">Your shotgun start</span><strong id="start-summary">Hole 14 · 11:00 AM</strong></div>
+          <div className="start-facts">
+            <div><span className="start-label">Your shotgun start</span><strong id="start-summary">Hole 14 · 11:00 AM</strong></div>
+            <div><span className="start-label">First food stop</span><strong id="first-food-summary">Hole 14 · Sushi</strong></div>
+          </div>
           <div className="start-actions">
             <a href="#hole-14" id="start-round-link">Start the round <span>↓</span></a>
             <a href="#group-setup" className="customize-link">Customize group</a>
@@ -228,6 +269,11 @@ export default function Home() {
             <span className="rain-loading">Loading Weather.gov…</span>
           </div>
           <small id="rain-updated">Updates hourly from the National Weather Service.</small>
+        </div>
+        <div className="day-checks" aria-label="Course-day reminders">
+          <span><b>Walking course</b>Lighten your bag before arrival.</span>
+          <span><b>Caddie courtesy</b>Plan as a foursome to tip both caddies appropriately.</span>
+          <span><b>Best-ball scoring</b>Enter every individual score in Golf Genius after each hole.</span>
         </div>
       </section>
 
@@ -257,7 +303,7 @@ export default function Home() {
           <article><span>9:30 AM</span><strong>Drive-through registration</strong><p>Staff collect and tag your golf bag, then you check in and receive tournament swag without leaving the car.</p></article>
           <article><span>After check-in</span><strong>Park, shuttle, breakfast</strong><p>Park in the designated lot. A complimentary shuttle returns you to the clubhouse for breakfast.</p></article>
           <article><span>11:00 AM sharp</span><strong>Shotgun start</strong><p>Carts take players to their starting holes and return them after play. The course itself is walking only.</p></article>
-          <article><span>During the round</span><strong>Two caddies per foursome</strong><p>They will carry the bags. Remove unnecessary items before arrival; locker rooms and changing facilities are available.</p></article>
+          <article className="caddie-card"><span>During the round</span><strong>Two caddies per foursome</strong><p>They will carry the bags. Remove unnecessary items before arrival; locker rooms and changing facilities are available.</p><p className="caddie-tip"><b>Caddie courtesy:</b> Please coordinate as a foursome and tip both caddies appropriately at the end of the round.</p></article>
         </div>
         <details className="arrival-details">
           <summary>Address and arrival checklist</summary>
@@ -398,8 +444,12 @@ export default function Home() {
               </div>
               {foodStops[hole.n] && (
                 <aside className="hole-stop">
-                  <span>Food stop</span>
-                  <strong>{foodStops[hole.n]}</strong>
+                  <SponsorLogos sponsors={foodStops[hole.n].sponsors} compact />
+                  <div>
+                    <span>Food stop</span>
+                    <strong>{foodStops[hole.n].offering}</strong>
+                    {foodStops[hole.n].note && <small>{foodStops[hole.n].note}</small>}
+                  </div>
                 </aside>
               )}
               <div className="strategy-grid">
@@ -434,13 +484,14 @@ export default function Home() {
           <p>Stops appear inside each hole card and automatically follow your selected starting hole. Snacks are spread throughout the course.</p>
         </div>
         <div className="hospitality-grid">
-          <article><span>Hole 1</span><strong>Muscat hot dogs</strong></article>
-          <article><span>Holes 2 / 3</span><strong>Smash House</strong><p>Poppers and wings.</p></article>
-          <article><span>Holes 5 / 6 / 12</span><strong>Sunflower + Doma</strong><p>Smoothie bar and tuna tartare at the shared meeting point.</p></article>
-          <article><span>Hole 8</span><strong>Rita’s ices</strong></article>
-          <article><span>Hole 10</span><strong>Chimichurri</strong><p>Beef jerky and salamis.</p></article>
-          <article><span>Hole 14</span><strong>Sushi Tokyo</strong><p>Sushi.</p></article>
-          <article><span>Hole 17</span><strong>Shot table + Holy Schnitzel</strong><p>Mini burgers.</p></article>
+          {hospitalityStops.map((stop) => (
+            <article key={stop.holes}>
+              <span>{stop.holes}</span>
+              <SponsorLogos sponsors={stop.sponsors} />
+              <strong>{stop.offering}</strong>
+              {stop.note && <p>{stop.note}</p>}
+            </article>
+          ))}
           <article className="all-course-stop"><span>All course</span><strong>Snacks throughout</strong><p>Keep something small in the bag between larger stops.</p></article>
           <article><span>After the round</span><strong>19th Hole Recovery Lounge</strong><p>Complimentary IV hydration from Wellspring Drips, plus massage or chiropractic care from Long Island Spine & Sport.</p></article>
         </div>
