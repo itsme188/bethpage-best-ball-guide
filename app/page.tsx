@@ -83,7 +83,7 @@ function SponsorLogos({ sponsors, compact = false }: { sponsors: Sponsor[]; comp
     <div className={`sponsor-logos ${compact ? "compact" : ""}`}>
       {sponsors.map((item) => (
         <span className="sponsor-logo" key={item.name}>
-          <img src={item.logo} alt={`${item.name} logo`} />
+          <img src={item.logo} alt={`${item.name} logo`} loading="lazy" decoding="async" />
         </span>
       ))}
     </div>
@@ -188,7 +188,12 @@ function CourseMap({ hole }: { hole: Hole }) {
   const plan = shotPlan(hole);
   const mapCanvas = (expanded = false) => (
     <div className={`course-map ${expanded ? "expanded-map" : ""}`}>
-      <img src={`/aerials/hole-${hole.n}.webp`} alt={`Aerial map of Bethpage Black hole ${hole.n}, oriented from tee to green`} />
+      <img
+        src={`/aerials/hole-${hole.n}.webp`}
+        alt={`Aerial map of Bethpage Black hole ${hole.n}, oriented from tee to green`}
+        loading="lazy"
+        decoding="async"
+      />
       <span className="map-shade" />
       {plan.points.slice(0, -1).map((start, index) => {
         const end = plan.points[index + 1];
@@ -221,10 +226,25 @@ function CourseMap({ hole }: { hole: Hole }) {
   return (
     <div className="aerial-wrap">
       {mapCanvas()}
-      <input className="map-zoom-toggle" type="checkbox" id={`zoom-map-${hole.n}`} />
-      <label className="map-open" htmlFor={`zoom-map-${hole.n}`}>Expand aerial ↗</label>
-      <div className="map-modal" role="dialog" aria-label={`Expanded aerial map of hole ${hole.n}`}>
-        <label className="map-close" htmlFor={`zoom-map-${hole.n}`}>Close ×</label>
+      <button
+        className="map-open"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls={`map-modal-${hole.n}`}
+        data-map-open
+      >
+        Expand aerial ↗
+      </button>
+      <div
+        className="map-modal"
+        id={`map-modal-${hole.n}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Expanded aerial map of hole ${hole.n}`}
+        data-map-modal
+        hidden
+      >
+        <button className="map-close" type="button" data-map-close>Close ×</button>
         {mapCanvas(true)}
         <div className="aerial-legend expanded-legend">
           {plan.targets.map((target, index) => (
@@ -244,9 +264,13 @@ function CourseMap({ hole }: { hole: Hole }) {
 export default function Home() {
   return (
     <main>
+      <div className="connection-status" id="connection-status" role="status" aria-live="polite" hidden>
+        <strong>Connection lost</strong>
+        <span>Open content still works. Weather and unloaded maps may wait.</span>
+      </div>
       <section className="hero">
-        <img className="hero-ball" src="/event/teal-golf-ball.png" alt="" aria-hidden="true" />
-        <img className="event-lockup" src="/event/tournament-lockup.png" alt="Ohel Rosemil Healthcare Golf Tournament" />
+        <img className="hero-ball" src="/event/teal-golf-ball.png" alt="" aria-hidden="true" decoding="async" />
+        <img className="event-lockup" src="/event/tournament-lockup.png" alt="Ohel Rosemil Healthcare Golf Tournament" decoding="async" fetchPriority="high" />
         <div className="eyebrow">Bethpage Black · July 27, 2026</div>
         <h1>Everything you need,<br /><span>hole by hole.</span></h1>
         <p className="hero-copy" id="hero-profile">Yellow tees · personalized for your starting hole, group handicap, and reliable club distances.</p>

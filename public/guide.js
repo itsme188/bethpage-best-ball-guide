@@ -532,6 +532,69 @@
     setupPanel.open = true;
   });
 
+  const mapTriggers = new WeakMap();
+  const closeMap = (modal, restoreFocus = true) => {
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    document.body.classList.remove("map-dialog-open");
+    if (restoreFocus) mapTriggers.get(modal)?.focus();
+  };
+
+  document.querySelectorAll("[data-map-open]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const modal = document.getElementById(button.getAttribute("aria-controls"));
+      if (!modal) return;
+      mapTriggers.set(modal, button);
+      modal.hidden = false;
+      document.body.classList.add("map-dialog-open");
+      modal.querySelector("[data-map-close]")?.focus();
+    });
+  });
+
+  document.querySelectorAll("[data-map-modal]").forEach((modal) => {
+    modal.querySelector("[data-map-close]")?.addEventListener("click", () => closeMap(modal));
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeMap(modal);
+    });
+  });
+
+  document.addEventListener("keydown", (event) => {
+    const openModal = document.querySelector("[data-map-modal]:not([hidden])");
+    if (!openModal) return;
+    if (event.key === "Escape") {
+      closeMap(openModal);
+      return;
+    }
+    if (event.key === "Tab") {
+      event.preventDefault();
+      openModal.querySelector("[data-map-close]")?.focus();
+    }
+  });
+
+  const connectionStatus = document.querySelector("#connection-status");
+  let reconnectTimer;
+  const setConnectionState = (isOnline) => {
+    if (!connectionStatus) return;
+    window.clearTimeout(reconnectTimer);
+    if (!isOnline) {
+      connectionStatus.classList.remove("is-online");
+      connectionStatus.querySelector("strong").textContent = "Connection lost";
+      connectionStatus.querySelector("span").textContent = "Open content still works. Weather and unloaded maps may wait.";
+      connectionStatus.hidden = false;
+      return;
+    }
+    if (connectionStatus.hidden) return;
+    connectionStatus.classList.add("is-online");
+    connectionStatus.querySelector("strong").textContent = "Back online";
+    connectionStatus.querySelector("span").textContent = "Live weather and maps can refresh again.";
+    reconnectTimer = window.setTimeout(() => {
+      connectionStatus.hidden = true;
+    }, 2500);
+  };
+  window.addEventListener("offline", () => setConnectionState(false));
+  window.addEventListener("online", () => setConnectionState(true));
+  setConnectionState(navigator.onLine);
+
   document.querySelector("#share-setup")?.addEventListener("click", async () => {
     if (!form.reportValidity()) return;
     const profile = applyProfile(readForm(), { persist: true });

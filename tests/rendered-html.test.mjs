@@ -30,6 +30,7 @@ test("renders the complete tournament guide", async () => {
   assert.match(html, /name="driver"/);
   assert.match(html, /name="longName"/);
   assert.match(html, /id="rain-widget"/);
+  assert.match(html, /id="connection-status"/);
   assert.match(html, /id="first-food-summary"/);
   assert.match(html, /Donate to Ohel/);
   assert.match(html, /data-danger-window/);
@@ -40,6 +41,10 @@ test("renders the complete tournament guide", async () => {
   assert.match(html, /tip both caddies appropriately/i);
   assert.match(html, /Why we play/);
   assert.equal((html.match(/class="hole-card"/g) ?? []).length, 18);
+  assert.equal((html.match(/data-map-open="true"/g) ?? []).length, 18);
+  assert.equal((html.match(/data-map-modal="true"/g) ?? []).length, 18);
+  assert.equal((html.match(/loading="lazy"/g) ?? []).length, 57);
+  assert.equal((html.match(/aria-modal="true"/g) ?? []).length, 18);
   assert.doesNotMatch(html, /codex-preview|Building your site|react-loading-skeleton/i);
 });
 
@@ -92,6 +97,12 @@ test("ships the client-side personalization engine and aerial assets", async () 
   assert.match(script, /URLSearchParams/);
   assert.match(script, /querySelector\("\.customize-link"\)/);
   assert.match(script, /setupPanel\.open = true/);
+  assert.match(script, /map-dialog-open/);
+  assert.match(script, /event\.key === "Escape"/);
+  assert.match(script, /event\.key === "Tab"/);
+  assert.match(script, /event\.target === modal/);
+  assert.match(script, /window\.addEventListener\("offline"/);
+  assert.match(script, /window\.addEventListener\("online"/);
   assert.match(script, /DOMContentLoaded/);
   assert.doesNotMatch(script, /window\.addEventListener\("load"/);
 
