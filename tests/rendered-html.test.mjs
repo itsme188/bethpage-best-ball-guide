@@ -70,6 +70,8 @@ test("accepts every whole-yard club distance and ships a valid default form", as
 
   const script = await readFile(new URL("../public/guide.js", import.meta.url), "utf8");
   assert.match(script, /form\.reportValidity\(\)/);
+  const deployedHtml = await readFile(new URL("../docs/index.html", import.meta.url), "utf8");
+  assert.match(deployedHtml, /src="guide\.js\?v=[a-f0-9]{12}"/);
 });
 
 test("ships the client-side personalization engine and aerial assets", async () => {
