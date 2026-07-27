@@ -88,6 +88,8 @@ test("ships the client-side personalization engine and aerial assets", async () 
   assert.match(script, /pointAlongRoute/);
   assert.match(script, /navigator\.clipboard/);
   assert.match(script, /URLSearchParams/);
+  assert.match(script, /querySelector\("\.customize-link"\)/);
+  assert.match(script, /setupPanel\.open = true/);
   assert.match(script, /DOMContentLoaded/);
   assert.doesNotMatch(script, /window\.addEventListener\("load"/);
 

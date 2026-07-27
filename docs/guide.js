@@ -528,6 +528,10 @@
     status.value = `Guide updated for a Hole ${profile.start} start.`;
   });
 
+  document.querySelector(".customize-link")?.addEventListener("click", () => {
+    setupPanel.open = true;
+  });
+
   document.querySelector("#share-setup")?.addEventListener("click", async () => {
     if (!form.reportValidity()) return;
     const profile = applyProfile(readForm(), { persist: true });
