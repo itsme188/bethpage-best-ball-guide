@@ -344,7 +344,7 @@ export default function Home() {
               </label>
               <label>
                 <span>Reliable driver distance</span>
-                <span className="input-with-unit"><input name="driver" type="number" inputMode="numeric" min="140" max="330" step="5" defaultValue="225" /><em>yd</em></span>
+                <span className="input-with-unit"><input name="driver" type="number" inputMode="numeric" min="140" max="330" step="1" defaultValue="225" /><em>yd</em></span>
               </label>
             </div>
             <fieldset>
@@ -352,15 +352,15 @@ export default function Home() {
               <div className="club-grid">
                 <div className="club-pair">
                   <label><span>Long club</span><input name="longName" type="text" maxLength={16} defaultValue="3-wood" /></label>
-                  <label><span>Distance</span><span className="input-with-unit"><input name="long" type="number" inputMode="numeric" min="100" max="260" step="5" defaultValue="178" /><em>yd</em></span></label>
+                  <label><span>Distance</span><span className="input-with-unit"><input name="long" type="number" inputMode="numeric" min="100" max="260" step="1" defaultValue="178" /><em>yd</em></span></label>
                 </div>
                 <div className="club-pair">
                   <label><span>Mid iron</span><input name="midName" type="text" maxLength={16} defaultValue="7-iron" /></label>
-                  <label><span>Distance</span><span className="input-with-unit"><input name="mid" type="number" inputMode="numeric" min="70" max="220" step="5" defaultValue="145" /><em>yd</em></span></label>
+                  <label><span>Distance</span><span className="input-with-unit"><input name="mid" type="number" inputMode="numeric" min="70" max="220" step="1" defaultValue="145" /><em>yd</em></span></label>
                 </div>
                 <div className="club-pair">
                   <label><span>Comfortable wedge</span><input name="wedgeName" type="text" maxLength={16} defaultValue="PW" /></label>
-                  <label><span>Distance</span><span className="input-with-unit"><input name="wedge" type="number" inputMode="numeric" min="40" max="160" step="5" defaultValue="105" /><em>yd</em></span></label>
+                  <label><span>Distance</span><span className="input-with-unit"><input name="wedge" type="number" inputMode="numeric" min="40" max="160" step="1" defaultValue="105" /><em>yd</em></span></label>
                 </div>
               </div>
             </fieldset>

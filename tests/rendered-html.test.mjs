@@ -43,6 +43,35 @@ test("renders the complete tournament guide", async () => {
   assert.doesNotMatch(html, /codex-preview|Building your site|react-loading-skeleton/i);
 });
 
+test("accepts every whole-yard club distance and ships a valid default form", async () => {
+  const response = await render();
+  const html = await response.text();
+  const numericInputs = [...html.matchAll(/<input\b[^>]*type="number"[^>]*>/gi)].map(([input]) => input);
+  const attributes = (input) => Object.fromEntries(
+    [...input.matchAll(/(\w+)="([^"]*)"/g)].map(([, name, value]) => [name, value]),
+  );
+  const fields = numericInputs.map(attributes);
+  const yardageFields = fields.filter(({ name }) => ["driver", "long", "mid", "wedge"].includes(name));
+
+  assert.equal(yardageFields.length, 4);
+  for (const field of yardageFields) {
+    assert.equal(field.step, "1", `${field.name} must accept every whole-yard distance`);
+  }
+
+  for (const field of fields) {
+    const value = Number(field.value);
+    const min = Number(field.min);
+    const max = Number(field.max);
+    const step = Number(field.step);
+    assert.ok(Number.isFinite(value), `${field.name} must have a numeric default`);
+    assert.ok(value >= min && value <= max, `${field.name} default must be within range`);
+    assert.equal((value - min) % step, 0, `${field.name} default must satisfy its step`);
+  }
+
+  const script = await readFile(new URL("../public/guide.js", import.meta.url), "utf8");
+  assert.match(script, /form\.reportValidity\(\)/);
+});
+
 test("ships the client-side personalization engine and aerial assets", async () => {
   const script = await readFile(new URL("../public/guide.js", import.meta.url), "utf8");
   assert.match(script, /bethpage-group-profile-v2/);
@@ -59,6 +88,8 @@ test("ships the client-side personalization engine and aerial assets", async () 
   assert.match(script, /pointAlongRoute/);
   assert.match(script, /navigator\.clipboard/);
   assert.match(script, /URLSearchParams/);
+  assert.match(script, /DOMContentLoaded/);
+  assert.doesNotMatch(script, /window\.addEventListener\("load"/);
 
   await Promise.all(
     Array.from({ length: 18 }, (_, index) =>

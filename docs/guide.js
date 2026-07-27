@@ -529,6 +529,7 @@
   });
 
   document.querySelector("#share-setup")?.addEventListener("click", async () => {
+    if (!form.reportValidity()) return;
     const profile = applyProfile(readForm(), { persist: true });
     const link = `${location.origin}${location.pathname}?${paramsFor(profile)}`;
     try {
@@ -588,9 +589,9 @@
   });
   };
 
-  if (document.readyState === "complete") {
-    setTimeout(initializeGuide, 0);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => setTimeout(initializeGuide, 0), { once: true });
   } else {
-    window.addEventListener("load", () => setTimeout(initializeGuide, 0), { once: true });
+    setTimeout(initializeGuide, 0);
   }
 })();
